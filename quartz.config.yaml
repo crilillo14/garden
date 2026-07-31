@@ -98,7 +98,8 @@ plugins:
     order: 80
   - source: github:quartz-community/citations
     enabled: false
-    order: 85 - source: github:quartz-community/hard-line-breaks
+    order: 85
+  - source: github:quartz-community/hard-line-breaks
     enabled: true
     order: 90
   - source: github:quartz-community/ox-hugo
