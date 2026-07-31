@@ -1,9 +1,7 @@
 
+# A collection of notes
 
-
-title: Home
----
-Welcome to my notes!
+Recently I've decided to abandon pen & paper in favor of digitizing my entire collection of notes. This is my effort to do so.
 
 
 

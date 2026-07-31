@@ -1,3 +1,14 @@
 @use "./variables.scss" as *;
 
 // put your custom CSS here!
+
+// The explorer plugin pins the mobile top bar (search/darkmode/reader icons)
+// with position: sticky so it stays visible while scrolling, but the theme
+// plugin's cascade resets its background to transparent afterwards — so
+// scrolled article content shows through behind the icons. Reassert an
+// opaque background matching the page.
+@media all and ($mobile) {
+  .page > #quartz-body .sidebar.left:has(.explorer) {
+    background-color: var(--light) !important;
+  }
+}
