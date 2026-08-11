@@ -1091,8 +1091,7 @@ export async function handlePluginInstallUnified({
       try {
         if (action === "update") {
           console.log(styleText("cyan", `  → ${name}: updating to ${entry.commit.slice(0, 7)}...`))
-          const fetchRef = entry.ref ? ` ${entry.ref}` : ""
-          await execAsync(`git fetch --depth 1 origin${fetchRef}`, { cwd: pluginDir })
+          await execAsync(`git fetch --depth 1 origin ${entry.commit}`, { cwd: pluginDir })
           await execAsync(`git reset --hard ${entry.commit}`, { cwd: pluginDir })
           pluginsToBuild.push({ name, pluginDir })
           installed++
