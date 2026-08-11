@@ -53,6 +53,40 @@ li.task-list-item input[type="checkbox"]:checked {
   border-color: var(--secondary) !important;
 }
 
+// Same story for links, but the theme reads color from CSS custom properties
+// (--link-color/--link-external-color/--link-unresolved-color) rather than
+// hardcoding it inline, and those properties are consumed by rules scattered
+// across article content, breadcrumbs, backlinks, and the TOC — all of which
+// carry Obsidian's own class names (Quartz emits e.g. class="internal
+// internal-link" for compatibility) so the theme's selectors match everywhere
+// Quartz's own selectors do. Overriding the variables themselves at the root,
+// instead of re-fighting every consuming selector one by one, fixes every
+// consumer in one shot. --bold-color/--italic-color are read by bare
+// `strong`/`em`/`b`/`i` selectors the same way, and were never defined by the
+// theme at all (so they don't show up when grepping for hardcoded colors) —
+// defining them here pins the color instead of leaving it to fall through to
+// whatever happens to be inherited.
+:root {
+  --link-color: var(--secondary) !important;
+  --link-external-color: var(--secondary) !important;
+  --link-unresolved-color: var(--secondary) !important;
+  --bold-color: var(--secondary) !important;
+  --italic-color: var(--tertiary) !important;
+}
+
+.page article a:not([role="anchor"]) {
+  &:hover {
+    color: var(--tertiary) !important;
+  }
+}
+
+// The pill-style background on internal wikilinks (--highlight) reads fine
+// in light mode but looks like unwanted highlighting in dark mode — drop it
+// there while keeping the link color/hover behavior above.
+html[saved-theme="dark"] .page a.internal {
+  background-color: transparent;
+}
+
 // ============================================================================
 // Typography refinement
 // ============================================================================
@@ -77,11 +111,11 @@ li.task-list-item input[type="checkbox"]:checked {
 // covers the plain-text and plain-blockquote cases they don't touch.
 .page article {
   strong {
-    color: var(--secondary);
+    color: var(--secondary) !important;
   }
 
   em {
-    color: var(--tertiary);
+    color: var(--tertiary) !important;
   }
 
   // Plain `>` quotes (not [!callout]-style) get a soft background tint so
