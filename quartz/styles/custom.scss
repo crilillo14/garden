@@ -12,3 +12,86 @@
     background-color: var(--light) !important;
   }
 }
+
+// ============================================================================
+// quartz-themes "default" preset overrides
+// ============================================================================
+// The `theme: default` preset ships a machine-scraped port of Obsidian's own
+// CSS, injected into cascade layers (obsidian-theme / quartz-themes-base /
+// obsidian-theme-overrides) that all outrank our own quartz-base layer
+// regardless of selector specificity — so its rules win even when ours are
+// more specific. A few of its rules hardcode values that ignore our
+// configured palette. !important is required to win here since normal
+// cascade specificity can't cross a layer boundary.
+
+// Every <p> was being recolored to a muted gray and switched to the
+// interface font in both light and dark mode via `body p { color:
+// var(--text-muted); font-family: var(--font-interface); }`, silently
+// overriding the reading color/font set in base.scss.
+p {
+  color: var(--darkgray) !important;
+  font-family: var(--bodyFont) !important;
+}
+
+// Blockquote indentation was zeroed right after being set
+// (`padding-inline-start: var(--size-4-6); padding-left: 0px;` in the same
+// rule), and the border hardcoded to Obsidian's stock purple accent instead
+// of our --secondary. Scoped to :not(.callout) — [!info]/[!warning]/etc.
+// callouts are blockquotes too, and should keep their own per-type border
+// color from callouts.scss rather than being forced to --secondary.
+blockquote:not(.callout) {
+  border-inline-start: 3px solid var(--secondary) !important;
+  padding-inline-start: 1rem !important;
+}
+
+// Same hardcoded purple accent on transclude embeds and checked checkboxes.
+.transclude {
+  border-left-color: var(--secondary) !important;
+}
+
+li.task-list-item input[type="checkbox"]:checked {
+  border-color: var(--secondary) !important;
+}
+
+// ============================================================================
+// Typography refinement
+// ============================================================================
+// Slightly larger, more generously spaced body copy for the article content
+// — the Newsreader/Fraunces pairing reads better with a bit more room than
+// the browser default, especially for math-dense notes.
+.page article {
+  font-size: 1.0625rem;
+
+  p,
+  li {
+    line-height: 1.75rem;
+  }
+}
+
+// ============================================================================
+// Accent color: emphasis & plain quotes
+// ============================================================================
+// Give bold, italic, and plain (>) quotes a bit of the colored "pop" that
+// Obsidian community color themes give them, rather than just a weight/style
+// change. [!info]-style callouts already get this via callouts.scss — this
+// covers the plain-text and plain-blockquote cases they don't touch.
+.page article {
+  strong {
+    color: var(--secondary);
+  }
+
+  em {
+    color: var(--tertiary);
+  }
+
+  // Plain `>` quotes (not [!callout]-style) get a soft background tint so
+  // they read as a quiet "info box" the way callouts do, without stepping on
+  // callouts.scss's own per-type coloring.
+  blockquote:not(.callout) {
+    background-color: color-mix(in srgb, var(--secondary) 8%, transparent);
+    border-radius: 0 5px 5px 0;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    padding-right: 1rem;
+  }
+}

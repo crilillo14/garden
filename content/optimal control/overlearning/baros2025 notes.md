@@ -84,14 +84,18 @@ It's not weather mitigation, it's flight control. In other stochastic environmen
 
 Find the control sequence satisfying 
 
-$$\text{minimize } u \in C \mapsto \mathbb{E}_{Z \sim \nu_{\text{pop}}} \sum_{t=0}^{T-1} c_{t}(X_{t}^u(Z), u_{t}(X_{t}^u)) \:+ \Phi(X_{t}^u(Z)) $$
-$$=: \mathbb{E}_{Z\sim \nu_{pop}} [l(X^u(Z), u)]$$
+$$
+\text{minimize } u \in C \mapsto \mathbb{E}_{Z \sim \nu_{\text{pop}}} \sum_{t=0}^{T-1} c_{t}(X_{t}^u(Z), u_{t}(X_{t}^u)) \:+ \Phi(X_{t}^u(Z))
+$$
+$$
+=: \mathbb{E}_{Z\sim \nu_{pop}} [l(X^u(Z), u)]
+$$
 i.e. find the control sequence that minimizes the expected cost when sampling a random instance of the stochastic env from $\nu_{pop}$ of the trnasitionary costs (function of state, control and stoch env) up to the second to last step, plus the terminal cost dependent on only the final state.
 
 $C$ is the space of feedback controls.
 
 ---
- **Notation / semantics** -- Relative Entropy is the same as Kullback Leibler Divergence, and has an explicit and very simple connection to cross entropy. Regularizing with KL div.
+ **Notation / semantics** -- Relative Entropy is the same as Kullback Leibler Divergence, and has an explicit and very simple connection to cross entropy (KL = cross entropy - entropy). I should definitely read more info theory. 
 
 Also, this Baros builds from existing results from Propagation of Chaos in Mean Field Langevin Dynamics -- important to consult [[mean field Langevin Dynamics]] for background on this
 
@@ -99,22 +103,28 @@ Also, this Baros builds from existing results from Propagation of Chaos in Mean 
 
 **Assumptions of this framework >**
 
-1. $$\forall u \in C ,\; X^u(Z) \; \text{ is a Markov process}$$
-2. $$\text{Transition fns }\{h_t\}_{t=0}^{T-1}: X \times U \times Z \to X \text{ and costs } \Phi, c_{t} \text{ are known and continuous}$$
+1. $$
+   \forall u \in C ,\; X^u(Z) \; \text{ is a Markov process}
+   $$
+2. $$
+   \text{Transition fns }\{h_t\}_{t=0}^{T-1}: X \times U \times Z \to X \text{ and costs } \Phi, c_{t} \text{ are known and continuous}
+   $$
 Assumption 2 is simple "niceness" of problem formulation, and #1 can be alternatively interpreted to mean that X is a sufficient statistic to describe state (this is not a POMDP).
 
-> In the case of POMDPs, a derived "belief state" (probability distribution over $X$) would be a sufficient statistic. Any non markovian decision process can be, by enrichening the state space, markovian.
+> [!note] In the case of POMDPs, a derived "belief state" (probability distribution over $X$) would be a sufficient statistic. Any non markovian decision process can be, by enrichening the state space, markovian.
 
-_On empirical measures and risk minimisation_
+_On empirical measures and risk minimization_
 
-_def_  ERM: minimising an unbiased estimate of the expected loss
-$$\arg \min_{u \in C} \quad  \mathbb{E}_{Z\sim \nu_{n}}[l(X^u(Z), u)]$$
+ ERM (Empirical Risk Minimization): minimizing an unbiased estimate of the expected loss
+$$
+\arg \min_{u \in C} \quad  \mathbb{E}_{Z\sim \nu_{n}}[l(X^u(Z), u)]
+$$
 --- 
 ### 2.2 Overlearning 
 
 Authors cite a result from [[Reppen and Sonner]], where, when modelling the decision process of picking $u \in C$ as a 2-layer NN, overfitting to the training data (called *overlearning* in stochastic control literature) lead to poor out-of-sample generalization and in sample prediction rather than pattern recognition
 
-> Past that, [[Reppen and Sonner]] also proves an asymptotic result _(eq. 4)_ that as the parameter space gets sufficiently rich (model becomes sufficiently __wide__) then the minimiser of the empirical risk outperforms the expected loss of the best control sequence, as well as the __expected__ loss of the best *anticipatory* control policy. Very cool stuff.
+> Past that, [[Reppen and Sonner]] also proves an asymptotic result _(eq. 4)_ that as the parameter space gets sufficiently rich (model becomes sufficiently __wide__) then the minimiser of the empirical risk outperforms the expected loss of the best control sequence, as well as the __expected__ loss of the best *anticipatory* control policy. Very cool stuff, and goes to show that naively training on trajectories leaks information to future states, leading to overfitting & loss of generality.
 ## 2.3 Control Parametrisation via Mean-Field Neural Networks
 
 vocab from this section: 
@@ -130,10 +140,14 @@ then the feedback control associated with the $r$ neuron network is $u_{\theta(r
 
 given some input vector $X$, we can get the specific control via
 
-$$u_{\theta(r)}(X) = \frac{1}{r} \sum_{j=1}^r {a_{j}\sigma(w_{j}X + b_{j})}$$
+$$
+u_{\theta(r)}(X) = \frac{1}{r} \sum_{j=1}^r {a_{j}\sigma(w_{j}X + b_{j})}
+$$
 if we let 
 
-$$ \phi(\theta_{j}, X) = {a_{j}\sigma(w_{j}X + b_{j}}) $$
+$$
+\phi(\theta_{j}, X) = {a_{j}\sigma(w_{j}X + b_{j}})
+$$
 
 ... turns out understanding the mean field formalism of Neural Networks stems from physics, optimal transport, and measure theory. All this is more or less tackled [[notes on Mean Field Networks|notes on Mean Field Networks]].
 
@@ -144,11 +158,12 @@ The most important notion to remember, from those notes:
 > 
 > Though when you think about it, when learning an optimal feedback control, there is some configuration of parameters that lead to the best possible approximation of a best policy under uncertainty (call this $\theta^*$). And parameters in feed forward networks are completely permutable (all neurons fully connected), and so if we were to consider the empirical measure as $M \to \infty$, then **transporting** the measure $m^r$ (as a surrogate of $m^\infty$, the infinite analogue to $\theta^*$) to the _best_ measure $m^*$ under the cost constraint of [[Wasserstein Distance]] is in fact an admissable formulation of the inference & training dynamics of a 2-layer, feed forward network. 
 > 
+> Moreover, optimization of $\theta$ over $\Theta$ is largely __non-convex__, as follows from the equivalence of permuted neuron configurations in 2 layer MLPs. In optimizing for $\theta$, you do not get the similar guarantees that MFT gives when discussing optimizing parameter density measures $\{m_t\}_{0}^{T}$.
 
 
 ### notations / mean field formulation within Baros
 
-Notations between Baros and the resources used to study mean field formalisms for NNs vary slightly, and it's important that for future discussion, these are very clearly defined. 
+Notations between Baros and the resources used to study mean field formalisms for NNs vary slightly, and it's important that for future discussion, these are very clearly defined.
 
 - $\theta^r$ is the $r$ neurons of the NN powering the control sequence. ==Every point in discrete time of the control sequence has a disticnt neural netowork==.
 - control feedback parametrized by $r$ neurons : $u_{\theta(r)}$
@@ -162,7 +177,9 @@ Given the empirical measure $m^r = \frac{1}{r} \sum_{j=1}^r \delta_{\theta_{j}}$
 
 When talking about the motivation behind expressing NN inference with respect to the empirical measure : "This allows us to view gradient-based training methods as dynamical systems in the space of probability measures over Θ, which we may analyse using infinite-dimensional calculus."
 
-$$u_{m}(X) = \int_{\Theta} \phi(\theta, X) m(d\theta) = \mathbb{E}_{\theta \sim m}[\phi(\theta, X)]$$
+$$
+u_{m}(X) = \int_{\Theta} \phi(\theta, X) m(d\theta) = \mathbb{E}_{\theta \sim m}[\phi(\theta, X)]
+$$
 This is the mean field formalism in its final form.
 
 Going back to the highlighted portion, there is a distinct m^r for every t in 0, T. Though these are not related to each other (training will not be affected by past networks).
@@ -192,7 +209,9 @@ Clearly we can't know the transition probabilities of _any_ of out state action 
 
 _def_ 
 
-$$\hat{Q_{t}}(x, m_{\text{t : T}} , Z \,) = \sum_{s \ge t} c_{s}^* (X_{s}^{t,x,m}(Z), m_{s})$$
+$$
+\hat{Q_{t}}(x, m_{\text{t : T}} , Z \,) = \sum_{s \ge t} c_{s}^* (X_{s}^{t,x,m}(Z), m_{s})
+$$
 semantically, the sum of running costs and the final terminal cost given some sample Z.
 
 In [[hure25.pdf]], the ADP approach to finding an optimal control series is simply done by minimizing the empirical Q functions of $N$ samples of Z. In the measure controlled forumation of Baros et al, this behaves just as nice as with discrete action spaces, due to th Upper Triangular nature of minimisation via backwards induction (Given some Z i over t from 0 to T, one can always start from T and go back to 0, and will always be solving for exactly 1 unknown $m_t$).
@@ -207,7 +226,9 @@ In light of this shortcoming of pure ADP, and motivated by results in the settin
 
 AND SO, the revised minimisation, via backward induction, for every control $m_{t}$,  $t \in [0, T-1]$, is 
 
-$$m_{t}\in \mathcal{P}_{2}(\Theta) \mapsto \mathbb{E}_{Z \sim \nu_{n}} [\hat{Q_{t}}(X_{t}^{\text{ref}}(Z), m_{t}, Z)] + \frac{\sigma^2}{2\beta^2}KL(m_{t} \|\gamma^{\sigma})$$
+$$
+m_{t}\in \mathcal{P}_{2}(\Theta) \mapsto \mathbb{E}_{Z \sim \nu_{n}} [\hat{Q_{t}}(X_{t}^{\text{ref}}(Z), m_{t}, Z)] + \frac{\sigma^2}{2\beta^2}KL(m_{t} \|\gamma^{\sigma})
+$$
 
 P2theta is L2 space over the parameter space.
 

@@ -22,7 +22,9 @@ State and control space is very easily defined. now for the value funnction:
 - terminal nodes (3 Xs, 3 Os) are very easy to define the value of (W / L)
 - you approximate true value of a *certain state* (not control, this is an important distinction ), which more or less transaltes to the probability of winning [0 ,1] via *temporal difference learning*
 
-$$ V(s) \leftarrow V(s) + \alpha(V(s') - V(s))$$
+$$
+V(s) \leftarrow V(s) + \alpha(V(s') - V(s))
+$$
 
 - left arrow is used to indicate an update; this is done many times across many games 
 
@@ -62,13 +64,17 @@ $q(a)$ : the true *expected* value of some action a. In this case a is pulling s
 
 $Q_t(a)$ : is the estimated value of q(a) at t. 
 
-$$Q_{t}(a) = \frac{R_{1} + R_{2} + \cdots + R_{N_{t}(a)}}{N_{t}(a)}$$
+$$
+Q_{t}(a) = \frac{R_{1} + R_{2} + \cdots + R_{N_{t}(a)}}{N_{t}(a)}
+$$
 
 where $N_t(a)$ is the amount of times that a was chosen by the agent. 
 
 it can be observed now that 
 
-$$ \lim_{ t \to \infty } Q_{t}(a) = q(a)$$
+$$
+\lim_{ t \to \infty } Q_{t}(a) = q(a)
+$$
 as the mean of rewards over time will converge to the expected value of the unkown distribution (by law of large numbers ). known as the *sample average method* for action-value estimates.
 
 If we want to be fully exploitative, we can always choose the argmax a of Q_t(a).

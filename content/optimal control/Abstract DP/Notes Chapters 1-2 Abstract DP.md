@@ -17,7 +17,9 @@
 *1.2 Abstract DP Models*
 
 > Bertsekas will often discuss stationary policies more frequently, and will discuss a policy
-> $$\mu \in M$$
+> $$
+> \mu \in M
+> $$
 > When discussing **any** policy, unless there is need to discern between stationary and non stationary policies. (Stationary := $\pi = \{\mu, \mu, \ldots \}$) 
 
 *1.2.2 Monotonicity & Contraction Properties*
@@ -25,8 +27,13 @@
 For basically chapter 2, Bertsekas assumes these two properties about $J : X \mapsto R$. 
 
 **ALSO**,
-$$T, T_{\mu} : R(X) \mapsto R(X)$$
-is an assumption we will be cool with up until later. Then we will discuss operators that work in $$R^*(X) = \Re \cup \{- \infty , \infty\}$$ 
+$$
+T, T_{\mu} : R(X) \mapsto R(X)
+$$
+is an assumption we will be cool with up until later. Then we will discuss operators that work in 
+$$
+R^*(X) = \Re \cup \{- \infty , \infty\}
+$$ 
 > Important to remember: monotonicity and contraction are properties of the **bellman backup operator**, not the value function $J$.
 
 ### Intermission, and a slight overview of fixed point contraction mappings
@@ -57,20 +64,28 @@ We can impose assumption on $\alpha$ and $g$ to work with the $\\lim_{ N \to \in
 then 
 
 
-$$ J_\pi (x_{0}) = \lim_{ N \to \infty } \mathbb{E}_{w_{k}} \left\{ \sum_{k=1}^{N} {\alpha^k g(x_{k}, \mu_{k}(x_{k}), w_{k})} \right\}$$
-$$ k = 0, 1, 2, ...$$
+$$
+J_\pi (x_{0}) = \lim_{ N \to \infty } \mathbb{E}_{w_{k}} \left\{ \sum_{k=1}^{N} {\alpha^k g(x_{k}, \mu_{k}(x_{k}), w_{k})} \right\}
+$$
+$$
+k = 0, 1, 2, ...
+$$
 
 Just like deterministic optimal control but wiht expected val. Straightforward if $w_{k}\perp w_{k+1}$ (independent), more complicated if sources of randomness are more strictly tied to system state.
 
 **2. Finite-State Discounted Markovian Decision Problems**
 
 For stochastic systems with finite states, the system eq. may be defd by transition probabilities (like a markov chain)
-$$p_{xy}(u) = P(y = f(x,u,w) \mid x)$$
+$$
+p_{xy}(u) = P(y = f(x,u,w) \mid x)
+$$
 
 and then, you get a weighted sum of the one step lookahead cost with respect to the above distr. 
 
 
-$$H(x,u,J) = \sum_{y \in X} p_{xy}(u)(g(x,u,w) + \alpha J(y))$$
+$$
+H(x,u,J) = \sum_{y \in X} p_{xy}(u)(g(x,u,w) + \alpha J(y))
+$$
 
 discounted finite state MDP -- Applied to modelling continuous probs by discretization.
 
@@ -121,7 +136,10 @@ _Not explored; is not central to the understanding of chapter 2. Should be, agai
 
 $J \le TJ$ - just because your cost is going to be equal to or worse to your cost on the next step by taking the optimal control u.
 
-for the weighted sup norm $$\lvert \lvert J  \rvert  \rvert = \sup_{x  \in X} \frac{\lvert J(x) \rvert }{v(x)} $$
+for the weighted sup norm
+$$
+\lvert \lvert J  \rvert  \rvert = \sup_{x  \in X} \frac{\lvert J(x) \rvert }{v(x)}
+$$
 it's important to note that $v(x)$ semantically is a weighing of expected cost per state. Like if your process is getting on a flight, and states are paying for a flight and also paying for a snack, then there are some expected monetary values that should be around. paying 100$ for a snack when you should spend 5$ and paying 600$ for a flight that usually costs $500 isnt the same, in terms of cost. its just a weighing in terms of the total allocation of cost permitted by your system. 
 
 also, defining $B(X)$ is like some butcher shit, just getting rid of the fat (functions $J: X \to R$ that don't make sense).
@@ -132,7 +150,9 @@ A: Yes, it's the discount factor.
 
 monotonicity, when it holds along with contractivity, implies that 
 
-$$J^*(x) = \inf_{\mu \in M} J_{\mu}(x) \qquad\forall x \in X$$
+$$
+J^*(x) = \inf_{\mu \in M} J_{\mu}(x) \qquad\forall x \in X
+$$
 
 
 it can be proven that 
@@ -145,7 +165,9 @@ $$
 
 now, let's consider when J is less tractable.
 
-$$J_{\pi} = \lim \sup_{ N \to \infty }  T_{\mu_{0}}T_{\mu_{1}}T_{\mu_{1}}\cdots T_{\mu_{N-1}}\bar{J}(x) \qquad \forall x \in X$$
+$$
+J_{\pi} = \lim \sup_{ N \to \infty }  T_{\mu_{0}}T_{\mu_{1}}T_{\mu_{1}}\cdots T_{\mu_{N-1}}\bar{J}(x) \qquad \forall x \in X
+$$
 
 > Important :::: Under monotonicity, minimizing over U(X) for $J_\mu$ was the way to get $J^*$, but with nonstationary policies you minimize over $\Pi$. In fact, $M \subset \Pi$.
 
@@ -202,10 +224,14 @@ g (x, \mu) = $2\alpha\varepsilon$, cost is 0 for every other control
 
 optimal cost is to go to 2 right away -> $J^*(1) = J^*(2) = 0$ 
 
-let $$\tilde J (x) =  \begin{cases}
+let
+$$
+
+\tilde J (x) =  \begin{cases}
 -\varepsilon &\text{if $x = 1$} \\
 \varepsilon &\text{if $x = 2$} \\
 \end{cases}
+
 $$
 it can then be seen that the analytic bounds of moduli for the contraction of J holds with exact equality. $\forall \varepsilon \in \mathbb{R}$. 
 
@@ -226,7 +252,9 @@ we can, given some terminal cost fn $J_m$, we can succesively compute Js and mus
 
 as $m \rightarrow \infty$, the error of $J_\pi$ from the optimal cost fn goes to
 
-$$\limsup_{ m \to \infty } \|J_{\pi}-J^*\| \le \frac{{\epsilon + 2\alpha\delta}}{1- \alpha}$$
+$$
+\limsup_{ m \to \infty } \|J_{\pi}-J^*\| \le \frac{{\epsilon + 2\alpha\delta}}{1- \alpha}
+$$
 >For online lookahead (MPC) no error bound is known
 
 
@@ -237,7 +265,10 @@ Big scope: find a sufficiently good approximation of J*,  and then optimize H ov
 It can be proven that if the set of stationary policies M is finite, then there is some k > 0 such taht ... basically the optimal policy is tractable
 
 
-let $$\tilde M = \{J \in B(x) \mid J_\mu \neq J^*\}$$
+let
+$$
+\tilde M = \{J \in B(x) \mid J_\mu \neq J^*\}
+$$
 it follows obviously that the inf over M tilde of the error from J* is greater than 0. 
 
 *2.3.1 Approximate Value Iteration 
@@ -272,7 +303,9 @@ compute $J_{\mu^k}$ as the fixed point of $T_{\mu^k}$, the one step lookahead op
 *Improvement*
 
 Choose a better policy $\mu^{k+1}$ greedily :
-$$T_{\mu^{k+1}}J_{\mu^k} = TJ_{\mu^k}$$
+$$
+T_{\mu^{k+1}}J_{\mu^k} = TJ_{\mu^k}
+$$
 
 where $\mu^{k+1}(x) = \arg \min_{u \in U(x) } H(x, u, J_{\mu^k})$ for all x in X.
 

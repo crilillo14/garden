@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=./quartz/plugins/quartz-plugins.schema.json
 configuration:
-  pageTitle: Quartz 5
+  pageTitle: crilillo
   pageTitleSuffix: ""
   enableSPA: true
   enablePopovers: true
@@ -69,7 +69,7 @@ plugins:
       parseTags: true
       parseArrows: true
       parseBlockReferences: true
-      enableInHtmlEmbed: true 
+      enableInHtmlEmbed: true
       enableYouTubeEmbed: true
       enableVideoEmbed: true
       enableCheckbox: true
@@ -110,6 +110,11 @@ plugins:
     order: 92
   - source: github:quartz-community/fonts
     enabled: true
+    options:
+      fontOrigin: googleFonts
+      header: Fraunces
+      body: Newsreader
+      code: JetBrains Mono
   - source: github:quartz-community/remove-draft
     enabled: true
   - source: github:quartz-community/explicit-publish
