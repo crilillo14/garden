@@ -70,7 +70,6 @@ Further Background:
 - [[Propagation of Chaos]]
 - [[Entropy regulation]]
 
-
 ## 2. Problem Formulation
 
 An empirical risk minimisation problem
@@ -220,5 +219,5 @@ KL divergence is cross entropy - entropy of one of the measures
 ![[gibbsdef.png]]
 
 >!!! I have no idea where this comes from and what this means !!! Pretty important considering you're punishing divergence from _some measure_ that I don't understand... 
-
-
+>
+>==update: == look at [[geneology of gibbs measures]]
