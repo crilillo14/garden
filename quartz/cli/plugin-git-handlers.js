@@ -53,7 +53,7 @@ async function buildPluginAsync(pluginDir, name) {
     return true
   }
 
-  try {
+  const runBuild = async () => {
     const skipBuild = !needsBuild(pluginDir)
     console.log(styleText("cyan", `  → ${name}: installing dependencies...`))
     await execAsync("npm install --ignore-scripts", { cwd: pluginDir })
@@ -62,10 +62,34 @@ async function buildPluginAsync(pluginDir, name) {
       await execAsync("npm run build", { cwd: pluginDir })
     }
     await execAsync("npm prune --omit=dev", { cwd: pluginDir })
+  }
+
+  try {
+    try {
+      await runBuild()
+    } catch (firstError) {
+      // node_modules restored from a filesystem-level build cache can be
+      // partial or stale (same class of issue as a cache-restored plugin
+      // directory missing its .git — see the install path above). Wipe it
+      // and retry once before giving up.
+      console.log(
+        styleText(
+          "yellow",
+          `  ⚠ ${name}: build failed (${String(firstError.message || firstError).split("\n")[0]}), retrying with a clean install...`,
+        ),
+      )
+      fs.rmSync(path.join(pluginDir, "node_modules"), { recursive: true, force: true })
+      await runBuild()
+    }
     linkPeerPlugins(pluginDir)
     return true
   } catch (error) {
-    console.log(styleText("red", `  ✗ ${name}: build failed`))
+    console.log(
+      styleText(
+        "red",
+        `  ✗ ${name}: build failed (${String(error.message || error).split("\n")[0]})`,
+      ),
+    )
     return false
   }
 }
@@ -1064,6 +1088,19 @@ export async function handlePluginInstallUnified({
         pluginsToBuild.push({ name, pluginDir })
         installed++
       } else {
+        // A filesystem-level cache restore (e.g. Vercel's build cache) can
+        // bring back the plugin's working-tree files without its nested
+        // .git directory, since .quartz/ is gitignored and never part of a
+        // real git checkout. Treat that as if the plugin were never cloned
+        // rather than handing a non-repo to `git fetch`/`reset --hard`,
+        // which fails outright.
+        const hasGit = fs.existsSync(path.join(pluginDir, ".git"))
+        if (!hasGit) {
+          fs.rmSync(pluginDir, { recursive: true, force: true })
+          gitEntries.push({ name, entry, pluginDir, action: "clone" })
+          continue
+        }
+
         const currentCommit = getGitCommit(pluginDir)
         if (currentCommit === entry.commit && !needsBuild(pluginDir)) {
           console.log(
@@ -1088,11 +1125,34 @@ export async function handlePluginInstallUnified({
   if (gitEntries.length > 0) {
     const concurrency = resolvedConcurrency
     await runParallel(gitEntries, concurrency, async ({ name, entry, pluginDir, action }) => {
+      const cloneFresh = async () => {
+        const branchArg = entry.ref ? ` --branch ${entry.ref}` : ""
+        await execAsync(`git clone --depth 1${branchArg} "${entry.resolved}" "${pluginDir}"`)
+        if (entry.commit !== "unknown") {
+          await execAsync(`git fetch --depth 1 origin ${entry.commit}`, { cwd: pluginDir })
+          await execAsync(`git checkout ${entry.commit}`, { cwd: pluginDir })
+        }
+      }
+
       try {
         if (action === "update") {
           console.log(styleText("cyan", `  → ${name}: updating to ${entry.commit.slice(0, 7)}...`))
-          await execAsync(`git fetch --depth 1 origin ${entry.commit}`, { cwd: pluginDir })
-          await execAsync(`git reset --hard ${entry.commit}`, { cwd: pluginDir })
+          try {
+            await execAsync(`git fetch --depth 1 origin ${entry.commit}`, { cwd: pluginDir })
+            await execAsync(`git reset --hard ${entry.commit}`, { cwd: pluginDir })
+          } catch (updateError) {
+            // The existing checkout may be corrupt/incomplete (e.g. a
+            // partial cache restore) rather than just behind — fall back to
+            // a clean clone instead of failing outright.
+            console.log(
+              styleText(
+                "yellow",
+                `  ⚠ ${name}: update failed (${String(updateError.message || updateError).split("\n")[0]}), re-cloning...`,
+              ),
+            )
+            fs.rmSync(pluginDir, { recursive: true, force: true })
+            await cloneFresh()
+          }
           pluginsToBuild.push({ name, pluginDir })
           installed++
         } else {
@@ -1107,20 +1167,18 @@ export async function handlePluginInstallUnified({
             })
           } else {
             console.log(styleText("cyan", `  → ${name}: cloning...`))
-            const branchArg = entry.ref ? ` --branch ${entry.ref}` : ""
-            await execAsync(`git clone --depth 1${branchArg} "${entry.resolved}" "${pluginDir}"`)
-            if (entry.commit !== "unknown") {
-              await execAsync(`git fetch --depth 1 origin ${entry.commit}`, { cwd: pluginDir })
-              await execAsync(`git checkout ${entry.commit}`, { cwd: pluginDir })
-            }
+            await cloneFresh()
           }
           console.log(styleText("green", `  ✓ ${name}@${entry.commit.slice(0, 7)}`))
           pluginsToBuild.push({ name, pluginDir })
           installed++
         }
-      } catch {
+      } catch (error) {
         console.log(
-          styleText("red", `  ✗ ${name}: failed to ${action === "update" ? "update" : "clone"}`),
+          styleText(
+            "red",
+            `  ✗ ${name}: failed to ${action === "update" ? "update" : "clone"} (${String(error.message || error).split("\n")[0]})`,
+          ),
         )
         failed++
       }
