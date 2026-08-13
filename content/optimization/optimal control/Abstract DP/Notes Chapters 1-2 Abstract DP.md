@@ -12,7 +12,7 @@
 	- Answer: fixed value problem on an operator == optimization. 
 	- for the sake of the algos
 - Clarification on whether I understand the reformulation of an infinite horizon problem in terms of T transforms
-	- I think it's because there makes no sense for there to be terminal states, thus no sense to have terminal value funnctions that are non zero
+	- I think it's because there makes no sense for there to be terminal states, thus no sense to have terminal value functions that are non zero
 
 *1.2 Abstract DP Models*
 

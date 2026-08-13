@@ -13,5 +13,5 @@ Recommendations from [YoonHaeng Hur's Intro to Optimal Transport](https://yoonha
  - [ABS21] Lectures on Optimal Transport (2021) 
  - [FG21] An Invitation to Optimal Transport, Wasserstein Distances, and Gradient Flows (2021)
 
-I think a good intro to this is [Thorpe 2018](https://www.damtp.cam.ac.uk/research/cia/files/teaching/Optimal_Transport_Notes.pdf), some lecture notes from a Cambridge course in 2018. I generally like the writing and presentation style of Cambridge profs; it kind of hits a good middle ground of aloofness and serious treatment of the material. More lecture-y, thus a better intro than maybe Villani and Santini.
+I think a good intro to this is [Thorpe 2018](https://www.damtp.cam.ac.uk/research/cia/files/teaching/Optimal_Transport_Notes.pdf), some lecture notes from a Cambridge course in 2018. I generally like the writing and presentation style of Cambridge profs; it kind of hits a good middle ground of aloofness and serious treatment of the material. 
 

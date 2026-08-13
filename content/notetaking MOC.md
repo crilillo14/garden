@@ -5,7 +5,7 @@ This is a map of all the note documents I've created since starting to use Obsid
 
 
 ## Convex Optimization
-- [[liveVault/convex optimization/index|index]]
+- [[liveVault/optimization/convex optimization/index|index]]
 
 ## Mean Field Theory
 - [[PL Lion's lectures on MFG]]
